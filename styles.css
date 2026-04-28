@@ -35,7 +35,8 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+select {
     font: inherit;
 }
 
@@ -58,7 +59,11 @@ textarea {
     display: flex;
     align-items: center;
     gap: 0.65rem;
+    padding: 0;
     color: var(--primary-deep);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
     font-size: clamp(1.25rem, 2vw, 1.7rem);
     font-weight: 800;
     letter-spacing: 0;
@@ -74,6 +79,10 @@ textarea {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-deep));
     border-radius: var(--radius);
     box-shadow: var(--shadow-light);
+}
+
+.logo:hover {
+    color: var(--primary-color);
 }
 
 .tab-nav {
@@ -107,6 +116,10 @@ textarea {
 .tab-btn.active {
     color: var(--primary-deep);
     background: var(--sky);
+}
+
+.logout-btn {
+    color: #842029;
 }
 
 main {
@@ -253,6 +266,11 @@ h2 {
     font-size: 1.02rem;
 }
 
+.clinic-highlights .stat-card strong {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    line-height: 1;
+}
+
 .clinic-highlights span,
 .contact-card span {
     color: var(--muted);
@@ -273,6 +291,19 @@ h2 {
     margin-bottom: 1.25rem;
 }
 
+.date-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.45rem 0.75rem;
+    color: var(--primary-deep);
+    background: var(--mint);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
 .patient-form {
     margin-top: 1.25rem;
 }
@@ -288,6 +319,17 @@ h2 {
     grid-column: 1 / -1;
 }
 
+.inline-control {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+}
+
+.icon-action {
+    min-width: 3.1rem;
+    padding: 0.7rem;
+}
+
 .patient-form label {
     display: block;
     margin-bottom: 0.45rem;
@@ -296,7 +338,11 @@ h2 {
 }
 
 .patient-form input,
-.patient-form textarea {
+.patient-form textarea,
+.patient-form select,
+.records-toolbar input,
+.records-toolbar select,
+.status-control select {
     width: 100%;
     padding: 0.9rem 0.95rem;
     color: var(--text-color);
@@ -307,13 +353,46 @@ h2 {
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
+.patient-form select,
+.records-toolbar select,
+.status-control select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--primary-deep) 50%), linear-gradient(135deg, var(--primary-deep) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+    background-repeat: no-repeat;
+    background-size: 6px 6px, 6px 6px;
+    padding-right: 2.4rem;
+}
+
 .patient-form textarea {
     min-height: 96px;
     resize: vertical;
 }
 
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    color: var(--primary-deep);
+    background: var(--mint);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-weight: 800;
+}
+
+.checkbox-field input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary-color);
+}
+
 .patient-form input:focus,
-.patient-form textarea:focus {
+.patient-form textarea:focus,
+.patient-form select:focus,
+.records-toolbar input:focus,
+.records-toolbar select:focus,
+.status-control select:focus {
     background: var(--white);
     border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(4, 124, 138, 0.14);
@@ -368,10 +447,37 @@ h2 {
     background: var(--white);
 }
 
+.records-toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(150px, 1fr)) auto;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.toolbar-action {
+    align-self: end;
+    min-height: 3.15rem;
+}
+
+.records-toolbar .form-group {
+    margin: 0;
+}
+
+.records-toolbar label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--primary-deep);
+    font-weight: 800;
+}
+
 .records-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 640px;
+    min-width: 980px;
 }
 
 .records-table th,
@@ -408,7 +514,9 @@ h2 {
 }
 
 .btn-edit,
-.btn-view {
+.btn-view,
+.btn-archive,
+.btn-reminder {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -432,6 +540,78 @@ h2 {
     background: var(--primary-color);
 }
 
+.btn-archive {
+    background: #6b7280;
+}
+
+.btn-reminder {
+    background: #128c7e;
+}
+
+.btn-reminder:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+}
+
+.action-cell {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 160px;
+}
+
+.status-control span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.status-control select {
+    min-height: 2.25rem;
+    padding: 0.45rem 2rem 0.45rem 0.65rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.8rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.status-pending {
+    color: #8a4d06;
+    background: #fff3cd;
+}
+
+.status-completed {
+    color: #0f5132;
+    background: #d1e7dd;
+}
+
+.status-rescheduled {
+    color: #084298;
+    background: #cfe2ff;
+}
+
+.status-missed {
+    color: #842029;
+    background: #f8d7da;
+}
+
 .contact-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -449,6 +629,68 @@ h2 {
     backdrop-filter: blur(6px);
 }
 
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background:
+        linear-gradient(135deg, rgba(7, 85, 105, 0.9), rgba(4, 124, 138, 0.76)),
+        url("https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1200") center / cover;
+}
+
+.login-overlay.hidden {
+    display: none;
+}
+
+.login-card {
+    width: min(420px, 100%);
+    padding: clamp(1.25rem, 4vw, 2rem);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-strong);
+}
+
+.login-card .form-group {
+    margin-top: 1rem;
+}
+
+.login-card label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--primary-deep);
+    font-weight: 800;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 0.9rem 0.95rem;
+    color: var(--text-color);
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    outline: none;
+}
+
+.login-card input:focus {
+    background: var(--white);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(4, 124, 138, 0.14);
+}
+
+.login-logo {
+    margin-bottom: 1rem;
+}
+
+#loginMessage {
+    margin-top: 1rem;
+    font-weight: 800;
+    text-align: center;
+}
+
 .modal-content {
     position: relative;
     width: min(680px, 100%);
@@ -459,6 +701,28 @@ h2 {
     border-radius: var(--radius);
     box-shadow: var(--shadow-strong);
     animation: slideIn 0.3s ease-out;
+}
+
+.modal-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-right: 3rem;
+}
+
+.modal-title-row h2 {
+    margin-bottom: 0;
+}
+
+.print-btn {
+    min-height: 2.4rem;
+    padding: 0.55rem 0.8rem;
+    white-space: nowrap;
+}
+
+.wide-modal {
+    width: min(980px, 100%);
 }
 
 @keyframes slideIn {
@@ -498,6 +762,105 @@ h2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     margin-top: 1.25rem;
+}
+
+.history-panel {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+}
+
+.compact-heading {
+    margin-bottom: 0.75rem;
+}
+
+.timeline {
+    display: grid;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding: 1rem 1rem 1rem 1.15rem;
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius);
+}
+
+.timeline-item time {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    color: var(--secondary-color);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.timeline-item h3 {
+    margin: 0 0 0.45rem;
+    color: var(--primary-deep);
+}
+
+.timeline-item p {
+    margin-bottom: 0.35rem;
+    color: var(--text-color);
+}
+
+.timeline-empty {
+    padding: 1rem;
+    color: var(--muted);
+    text-align: center;
+    background: var(--surface-soft);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+}
+
+.error-text {
+    color: #b42318;
+}
+
+.visit-form {
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.activity-panel {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.activity-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.activity-item {
+    padding: 0.8rem;
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.activity-item strong {
+    display: block;
+    color: var(--primary-deep);
+}
+
+.activity-item span {
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.activity-item p {
+    margin: 0.35rem 0 0;
 }
 
 .detail-item {
@@ -548,7 +911,9 @@ h2 {
 
     .hero-panel,
     .clinic-highlights,
-    .contact-grid {
+    .contact-grid,
+    .records-toolbar,
+    .activity-list {
         grid-template-columns: 1fr;
     }
 
@@ -648,9 +1013,15 @@ h2 {
     }
 
     .btn-edit,
-    .btn-view {
+    .btn-view,
+    .btn-archive,
+    .btn-reminder {
         width: auto;
         margin-right: 0;
+    }
+
+    .action-cell {
+        justify-content: flex-end;
     }
 
     .modal {
@@ -659,5 +1030,14 @@ h2 {
 
     .modal-content {
         margin: 1rem auto;
+    }
+
+    .modal-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .print-btn {
+        width: 100%;
     }
 }
