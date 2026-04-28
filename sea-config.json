@@ -1,0 +1,4 @@
+{
+  "main": "app.js",
+  "output": "sea-prep.blob"
+}

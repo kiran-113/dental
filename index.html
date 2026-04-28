@@ -9,12 +9,13 @@
 </head>
 <body>
     <header class="app-header">
-        <div class="logo"><i class="fa-solid fa-tooth"></i> SmileCare India</div>
+        <button class="logo" onclick="openTab(event, 'about')" aria-label="Go to main dashboard"><i class="fa-solid fa-tooth"></i> SmileCare India</button>
         <nav class="tab-nav" aria-label="Primary">
             <button class="tab-btn active" data-tab="about" onclick="openTab(event, 'about')"><i class="fa-solid fa-house-medical"></i><span>About</span></button>
             <button class="tab-btn" data-tab="patient-care" onclick="openTab(event, 'patient-care')"><i class="fa-solid fa-user-plus"></i><span>Patient Care</span></button>
             <button class="tab-btn" data-tab="view-records" onclick="openTab(event, 'view-records')"><i class="fa-solid fa-users-rectangle"></i><span>View Records</span></button>
             <button class="tab-btn" data-tab="contact" onclick="openTab(event, 'contact')"><i class="fa-solid fa-address-book"></i><span>Contact</span></button>
+            <button class="tab-btn logout-btn" onclick="logoutDoctor()"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
         </nav>
     </header>
 
@@ -34,20 +35,20 @@
             </div>
 
             <div class="clinic-highlights" aria-label="Clinic highlights">
-                <article>
-                    <i class="fa-solid fa-shield-heart"></i>
-                    <strong>Preventive Care</strong>
-                    <span>Cleanings, diagnosis, and family dental plans.</span>
+                <article class="stat-card">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <strong id="statTodayFollowups">0</strong>
+                    <span>Today's Follow-ups</span>
                 </article>
-                <article>
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                    <strong>Advanced Treatment</strong>
-                    <span>Root canals, implants, crowns, and restorations.</span>
+                <article class="stat-card">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    <strong id="statUpcomingFollowups">0</strong>
+                    <span>Upcoming Follow-ups</span>
                 </article>
-                <article>
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <strong>Smart Follow-ups</strong>
-                    <span>Daily follow-up visibility for the care team.</span>
+                <article class="stat-card">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <strong id="statMissedFollowups">0</strong>
+                    <span>Missed Follow-ups</span>
                 </article>
             </div>
 
@@ -57,6 +58,7 @@
                         <span class="eyebrow">Today</span>
                         <h2><i class="fa-solid fa-calendar-day"></i> Follow-ups</h2>
                     </div>
+                    <span id="todayDateLabel" class="date-pill"></span>
                 </div>
                 <div class="table-container">
                     <table class="records-table">
@@ -104,6 +106,21 @@
                         <input type="text" id="medications" placeholder="e.g., Paracetamol, Amoxicillin">
                     </div>
 
+                    <div class="form-group">
+                        <label for="treatment-category">Treatment Category</label>
+                        <select id="treatment-category">
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group category-add-group">
+                        <label for="new-treatment-category">Add Custom Category</label>
+                        <div class="inline-control">
+                            <input type="text" id="new-treatment-category" placeholder="e.g., Gum Surgery">
+                            <button type="button" class="ghost-btn icon-action" onclick="addTreatmentCategory('new-treatment-category', 'treatment-category')"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+
                     <div class="form-group full-width">
                         <label for="address">Address</label>
                         <textarea id="address" required placeholder="Full residential address..."></textarea>
@@ -113,6 +130,11 @@
                         <label for="notes">Doctor's Notes</label>
                         <textarea id="notes" placeholder="Diagnosis, symptoms, and treatment plan..."></textarea>
                     </div>
+
+                    <label class="checkbox-field full-width" for="whatsapp-consent">
+                        <input type="checkbox" id="whatsapp-consent">
+                        <span>Patient agreed to receive WhatsApp follow-up reminders</span>
+                    </label>
                 </div>
 
                 <button type="submit" class="submit-btn"><i class="fa-solid fa-address-card"></i> Register Patient</button>
@@ -126,7 +148,52 @@
                     <span class="eyebrow">Records</span>
                     <h2>Saved Patient Records</h2>
                 </div>
-                <p>Review and update patient details, medications, and follow-ups.</p>
+                <p><strong id="recordsTotalPatients">0</strong> active patients</p>
+            </div>
+            <div class="records-toolbar">
+                <div class="form-group search-field">
+                    <label for="recordSearch">Search</label>
+                    <input type="search" id="recordSearch" placeholder="Name or contact number">
+                </div>
+                <div class="form-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Rescheduled">Rescheduled</option>
+                        <option value="Missed">Missed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dateFilter">Follow-up</label>
+                    <select id="dateFilter">
+                        <option value="all">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="missed">Missed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sortRecords">Sort</label>
+                    <select id="sortRecords">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="followup-asc">Follow-up Soonest</option>
+                        <option value="name-asc">Name A-Z</option>
+                    </select>
+                </div>
+                <button class="ghost-btn toolbar-action" onclick="runAutomaticReminders()"><i class="fa-brands fa-whatsapp"></i> Run Reminders</button>
+            </div>
+            <div class="activity-panel">
+                <div class="section-heading compact-heading">
+                    <div>
+                        <span class="eyebrow">Clinic activity</span>
+                        <h2>Recent Activity</h2>
+                    </div>
+                    <span id="autoReminderStatus" class="date-pill">Scheduler ready</span>
+                </div>
+                <div id="activityLogList" class="activity-list"></div>
             </div>
             <div class="table-container">
                 <table class="records-table">
@@ -135,6 +202,7 @@
                             <th>Name</th>
                             <th>Contact</th>
                             <th>Follow-up</th>
+                            <th>Category</th>
                             <th>Medications</th>
                             <th>Actions</th>
                         </tr>
@@ -176,6 +244,24 @@
         </section>
     </main>
 
+    <div id="loginOverlay" class="login-overlay">
+        <form id="loginForm" class="login-card">
+            <div class="logo login-logo"><i class="fa-solid fa-tooth"></i> SmileCare India</div>
+            <span class="eyebrow">Doctor access</span>
+            <h2>Sign in to continue</h2>
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" required autocomplete="username" placeholder="doctor">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required autocomplete="current-password" placeholder="Password">
+            </div>
+            <button type="submit" class="submit-btn"><i class="fa-solid fa-lock"></i> Login</button>
+            <div id="loginMessage" role="status" aria-live="polite"></div>
+        </form>
+    </div>
+
     <div id="editModal" class="modal">
         <div class="modal-content">
             <button class="close" onclick="closeModal()" aria-label="Close edit modal">&times;</button>
@@ -199,6 +285,19 @@
                         <label for="edit-medications">Current Medication</label>
                         <input type="text" id="edit-medications">
                     </div>
+                    <div class="form-group">
+                        <label for="edit-treatment-category">Treatment Category</label>
+                        <select id="edit-treatment-category">
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+                    <div class="form-group category-add-group">
+                        <label for="edit-new-treatment-category">Add Custom Category</label>
+                        <div class="inline-control">
+                            <input type="text" id="edit-new-treatment-category" placeholder="e.g., Gum Surgery">
+                            <button type="button" class="ghost-btn icon-action" onclick="addTreatmentCategory('edit-new-treatment-category', 'edit-treatment-category')"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
                     <div class="form-group full-width">
                         <label for="edit-address">Address</label>
                         <textarea id="edit-address" required></textarea>
@@ -207,6 +306,10 @@
                         <label for="edit-notes">Doctor's Notes</label>
                         <textarea id="edit-notes"></textarea>
                     </div>
+                    <label class="checkbox-field full-width" for="edit-whatsapp-consent">
+                        <input type="checkbox" id="edit-whatsapp-consent">
+                        <span>Patient agreed to receive WhatsApp follow-up reminders</span>
+                    </label>
                 </div>
                 <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
             </form>
@@ -214,10 +317,58 @@
     </div>
 
     <div id="viewModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content wide-modal">
             <button class="close" onclick="closeViewModal()" aria-label="Close patient details modal">&times;</button>
-            <h2>Patient History & Details</h2>
+            <div class="modal-title-row">
+                <h2>Patient History & Details</h2>
+                <button class="ghost-btn print-btn" onclick="printPatientSummary()"><i class="fa-solid fa-print"></i> Print Summary</button>
+            </div>
             <div id="view-details-content" class="details-grid"></div>
+            <div class="history-panel">
+                <div class="section-heading compact-heading">
+                    <div>
+                        <span class="eyebrow">Timeline</span>
+                        <h2>Visit History</h2>
+                    </div>
+                </div>
+                <div id="visitTimeline" class="timeline"></div>
+                <form id="visitForm" class="patient-form visit-form">
+                    <input type="hidden" id="visit-patient-id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="visit-date">Visit Date</label>
+                            <input type="date" id="visit-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="visit-next-followup">Next Follow-up</label>
+                            <input type="date" id="visit-next-followup">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="visit-diagnosis">Diagnosis</label>
+                            <input type="text" id="visit-diagnosis" placeholder="e.g., Deep cavity in lower molar">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="visit-treatment-category">Treatment Category</label>
+                            <select id="visit-treatment-category">
+                                <option value="">Select category</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="visit-treatment">Treatment</label>
+                            <input type="text" id="visit-treatment" placeholder="e.g., Root canal session 1">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="visit-medications">Medications</label>
+                            <input type="text" id="visit-medications" placeholder="Medication prescribed this visit">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="visit-notes">Visit Notes</label>
+                            <textarea id="visit-notes" placeholder="Clinical notes, patient response, precautions..."></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn"><i class="fa-solid fa-notes-medical"></i> Add Visit Entry</button>
+                </form>
+            </div>
         </div>
     </div>
 
