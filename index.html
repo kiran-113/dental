@@ -10,9 +10,10 @@
     <header>
         <div class="logo">🦷 SmileCare India</div>
         <nav>
-            <button class="tab-btn active" onclick="openTab('about')">About</button>
-            <button class="tab-btn" onclick="openTab('patient-care')">Patient Care</button>
-            <button class="tab-btn" onclick="openTab('contact')">Contact Us</button>
+            <button class="tab-btn active" onclick="openTab(event, 'about')">About</button>
+            <button class="tab-btn" onclick="openTab(event, 'patient-care')">Patient Care</button>
+            <button class="tab-btn" onclick="openTab(event, 'view-records')">View Records</button>
+            <button class="tab-btn" onclick="openTab(event, 'contact')">Contact Us</button>
         </nav>
     </header>
 
@@ -21,6 +22,24 @@
         <section id="about" class="tab-content active">
             <h2>Welcome to SmileCare India</h2>
             <p>Providing world-class, affordable dental care for Indian families. We specialize in root canals, advanced implants, and preventative hygiene using state-of-the-art technology.</p>
+
+            <div class="dashboard-section" style="margin-top: 2rem; margin-bottom: 2rem;">
+                <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem;">📅 Today's Follow-ups</h3>
+                <div class="table-container">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact Number</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="todayTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1000" alt="Modern Dental Clinic" class="hero-img">
         </section>
 
@@ -65,6 +84,27 @@
             <div id="statusMessage"></div>
         </section>
 
+        <!-- View Records Tab -->
+        <section id="view-records" class="tab-content">
+            <h2>Saved Patient Records</h2>
+            <p>Review and update patient details, medications, and follow-ups.</p>
+            <div class="table-container">
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Follow-up</th>
+                            <th>Medications</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <!-- Contact Us Tab -->
         <section id="contact" class="tab-content">
             <h2>Contact Us</h2>
@@ -76,6 +116,53 @@
             </div>
         </section>
     </main>
+
+    <!-- Edit Patient Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Edit Patient Record</h2>
+            <form id="editForm" class="patient-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-name">Patient Name:</label>
+                    <input type="text" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-address">Address:</label>
+                    <textarea id="edit-address" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-contact">Contact Number:</label>
+                    <input type="tel" id="edit-contact" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-followup">Follow-up Date:</label>
+                    <input type="date" id="edit-followup" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-medications">Current Medication:</label>
+                    <input type="text" id="edit-medications">
+                </div>
+                <div class="form-group">
+                    <label for="edit-notes">Doctor's Notes:</label>
+                    <textarea id="edit-notes"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Patient History Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViewModal()">&times;</span>
+            <h2>Patient History & Details</h2>
+            <div id="view-details-content" class="details-grid">
+                <!-- Data populated via JS -->
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
