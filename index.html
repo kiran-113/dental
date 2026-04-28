@@ -5,26 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmileCare India | Dental Hospital</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="logo">🦷 SmileCare India</div>
-        <nav>
-            <button class="tab-btn active" onclick="openTab(event, 'about')">About</button>
-            <button class="tab-btn" onclick="openTab(event, 'patient-care')">Patient Care</button>
-            <button class="tab-btn" onclick="openTab(event, 'view-records')">View Records</button>
-            <button class="tab-btn" onclick="openTab(event, 'contact')">Contact Us</button>
+    <header class="app-header">
+        <div class="logo"><i class="fa-solid fa-tooth"></i> SmileCare India</div>
+        <nav class="tab-nav" aria-label="Primary">
+            <button class="tab-btn active" data-tab="about" onclick="openTab(event, 'about')"><i class="fa-solid fa-house-medical"></i><span>About</span></button>
+            <button class="tab-btn" data-tab="patient-care" onclick="openTab(event, 'patient-care')"><i class="fa-solid fa-user-plus"></i><span>Patient Care</span></button>
+            <button class="tab-btn" data-tab="view-records" onclick="openTab(event, 'view-records')"><i class="fa-solid fa-users-rectangle"></i><span>View Records</span></button>
+            <button class="tab-btn" data-tab="contact" onclick="openTab(event, 'contact')"><i class="fa-solid fa-address-book"></i><span>Contact</span></button>
         </nav>
     </header>
 
     <main>
-        <!-- About Tab -->
         <section id="about" class="tab-content active">
-            <h2>Welcome to SmileCare India</h2>
-            <p>Providing world-class, affordable dental care for Indian families. We specialize in root canals, advanced implants, and preventative hygiene using state-of-the-art technology.</p>
+            <div class="hero-panel">
+                <div class="hero-copy">
+                    <span class="eyebrow">Dental hospital dashboard</span>
+                    <h1>SmileCare India</h1>
+                    <p>Modern, affordable dental care for Indian families with streamlined follow-ups, patient records, and treatment notes in one calm workspace.</p>
+                    <div class="hero-actions">
+                        <button class="submit-btn compact" onclick="openTab(event, 'patient-care')"><i class="fa-solid fa-user-plus"></i> Register Patient</button>
+                        <button class="ghost-btn" onclick="openTab(event, 'view-records')"><i class="fa-solid fa-clipboard-list"></i> View Records</button>
+                    </div>
+                </div>
+                <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1000" alt="Modern Dental Clinic" class="hero-img">
+            </div>
 
-            <div class="dashboard-section" style="margin-top: 2rem; margin-bottom: 2rem;">
-                <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem;">📅 Today's Follow-ups</h3>
+            <div class="clinic-highlights" aria-label="Clinic highlights">
+                <article>
+                    <i class="fa-solid fa-shield-heart"></i>
+                    <strong>Preventive Care</strong>
+                    <span>Cleanings, diagnosis, and family dental plans.</span>
+                </article>
+                <article>
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <strong>Advanced Treatment</strong>
+                    <span>Root canals, implants, crowns, and restorations.</span>
+                </article>
+                <article>
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <strong>Smart Follow-ups</strong>
+                    <span>Daily follow-up visibility for the care team.</span>
+                </article>
+            </div>
+
+            <div class="section-card">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">Today</span>
+                        <h2><i class="fa-solid fa-calendar-day"></i> Follow-ups</h2>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table class="records-table">
                         <thead>
@@ -34,60 +67,67 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="todayTableBody">
-                        </tbody>
+                        <tbody id="todayTableBody"></tbody>
                     </table>
                 </div>
             </div>
-
-            <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1000" alt="Modern Dental Clinic" class="hero-img">
         </section>
 
-        <!-- Patient Care Tab -->
         <section id="patient-care" class="tab-content">
-            <h2>Patient Care & Registration</h2>
-            <p>Enter patient details below to add a new record to our Vercel Database.</p>
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Registration</span>
+                    <h2>Patient Care</h2>
+                </div>
+                <p>Capture patient details, follow-up dates, medications, and clinical notes.</p>
+            </div>
 
             <form id="patientForm" class="patient-form">
-                <div class="form-group">
-                    <label for="name">Patient Name:</label>
-                    <input type="text" id="name" required placeholder="e.g., Rahul Sharma">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Patient Name</label>
+                        <input type="text" id="name" required placeholder="e.g., Rahul Sharma">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact-number">Contact Number</label>
+                        <input type="text" id="contact-number" required inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="e.g., 9876543210">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="followup">Follow-up Date</label>
+                        <input type="date" id="followup" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medications">Current Medication</label>
+                        <input type="text" id="medications" placeholder="e.g., Paracetamol, Amoxicillin">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="address">Address</label>
+                        <textarea id="address" required placeholder="Full residential address..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="notes">Doctor's Notes</label>
+                        <textarea id="notes" placeholder="Diagnosis, symptoms, and treatment plan..."></textarea>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="address">Address:</label>
-                    <textarea id="address" required placeholder="Full residential address..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="contact">Contact Number:</label>
-                    <input type="tel" id="contact" required placeholder="+91 98765 43210">
-                </div>
-
-                <div class="form-group">
-                    <label for="followup">Follow-up Date:</label>
-                    <input type="date" id="followup" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="medications">Current Medication (if any):</label>
-                    <input type="text" id="medications" placeholder="e.g., Paracetamol, Amoxicillin">
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Doctor's Notes:</label>
-                    <textarea id="notes" placeholder="Diagnosis, symptoms, and treatment plan..."></textarea>
-                </div>
-
-                <button type="submit" class="submit-btn">Register Patient</button>
+                <button type="submit" class="submit-btn"><i class="fa-solid fa-address-card"></i> Register Patient</button>
             </form>
-            <div id="statusMessage"></div>
+            <div id="statusMessage" role="status" aria-live="polite"></div>
         </section>
 
-        <!-- View Records Tab -->
         <section id="view-records" class="tab-content">
-            <h2>Saved Patient Records</h2>
-            <p>Review and update patient details, medications, and follow-ups.</p>
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Records</span>
+                    <h2>Saved Patient Records</h2>
+                </div>
+                <p>Review and update patient details, medications, and follow-ups.</p>
+            </div>
             <div class="table-container">
                 <table class="records-table">
                     <thead>
@@ -99,68 +139,85 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="patientsTableBody">
-                    </tbody>
+                    <tbody id="patientsTableBody"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Contact Us Tab -->
         <section id="contact" class="tab-content">
-            <h2>Contact Us</h2>
-            <div class="contact-card">
-                <p><strong>🏥 Address:</strong> 42 Health Avenue, Bandra West, Mumbai, Maharashtra 400050</p>
-                <p><strong>📞 Phone:</strong> +91 22 1234 5678</p>
-                <p><strong>✉️ Email:</strong> appointments@smilecare.in</p>
-                <p><strong>⏰ Timings:</strong> Mon - Sat: 9:00 AM - 8:00 PM</p>
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Clinic desk</span>
+                    <h2>Contact Us</h2>
+                </div>
+            </div>
+            <div class="contact-grid">
+                <article class="contact-card">
+                    <i class="fa-solid fa-hospital"></i>
+                    <strong>Address</strong>
+                    <span>42 Health Avenue, Bandra West, Mumbai, Maharashtra 400050</span>
+                </article>
+                <article class="contact-card">
+                    <i class="fa-solid fa-phone"></i>
+                    <strong>Phone</strong>
+                    <span>+91 22 1234 5678</span>
+                </article>
+                <article class="contact-card">
+                    <i class="fa-solid fa-envelope"></i>
+                    <strong>Email</strong>
+                    <span>appointments@smilecare.in</span>
+                </article>
+                <article class="contact-card">
+                    <i class="fa-solid fa-clock"></i>
+                    <strong>Timings</strong>
+                    <span>Mon - Sat: 9:00 AM - 8:00 PM</span>
+                </article>
             </div>
         </section>
     </main>
 
-    <!-- Edit Patient Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <button class="close" onclick="closeModal()" aria-label="Close edit modal">&times;</button>
             <h2>Edit Patient Record</h2>
             <form id="editForm" class="patient-form">
                 <input type="hidden" id="edit-id">
-                <div class="form-group">
-                    <label for="edit-name">Patient Name:</label>
-                    <input type="text" id="edit-name" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-name">Patient Name</label>
+                        <input type="text" id="edit-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-contact">Contact Number</label>
+                        <input type="text" id="edit-contact" required inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-followup">Follow-up Date</label>
+                        <input type="date" id="edit-followup" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-medications">Current Medication</label>
+                        <input type="text" id="edit-medications">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="edit-address">Address</label>
+                        <textarea id="edit-address" required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="edit-notes">Doctor's Notes</label>
+                        <textarea id="edit-notes"></textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="edit-address">Address:</label>
-                    <textarea id="edit-address" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="edit-contact">Contact Number:</label>
-                    <input type="tel" id="edit-contact" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-followup">Follow-up Date:</label>
-                    <input type="date" id="edit-followup" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-medications">Current Medication:</label>
-                    <input type="text" id="edit-medications">
-                </div>
-                <div class="form-group">
-                    <label for="edit-notes">Doctor's Notes:</label>
-                    <textarea id="edit-notes"></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Save Changes</button>
+                <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
             </form>
         </div>
     </div>
 
-    <!-- View Patient History Modal -->
     <div id="viewModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeViewModal()">&times;</span>
+            <button class="close" onclick="closeViewModal()" aria-label="Close patient details modal">&times;</button>
             <h2>Patient History & Details</h2>
-            <div id="view-details-content" class="details-grid">
-                <!-- Data populated via JS -->
-            </div>
+            <div id="view-details-content" class="details-grid"></div>
         </div>
     </div>
 

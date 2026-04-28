@@ -1,7 +1,25 @@
 // Initialize dashboard data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    setupNumericContactFields();
     loadTodayFollowups();
 });
+
+function setupNumericContactFields() {
+    ['contact-number', 'edit-contact'].forEach((fieldId) => {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+
+        field.addEventListener('beforeinput', (event) => {
+            if (event.data && /\D/.test(event.data)) {
+                event.preventDefault();
+            }
+        });
+
+        field.addEventListener('input', () => {
+            field.value = field.value.replace(/\D/g, '');
+        });
+    });
+}
 
 // Handle tab navigation
 function openTab(event, tabId) {
@@ -15,9 +33,10 @@ function openTab(event, tabId) {
         btn.classList.remove('active');
     });
 
-    // Activate the selected tab and button
+    // Activate the selected tab and matching nav button
     document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    const navButton = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    if (navButton) navButton.classList.add('active');
 
     // If opening View Records, fetch the data
     if (tabId === 'view-records') {
@@ -32,7 +51,7 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const statusDiv = document.getElementById('statusMessage');
-    statusDiv.textContent = "Saving patient record...";
+    statusDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving patient record...';
     statusDiv.style.backgroundColor = "#eaf4ff";
     statusDiv.style.color = "#0056b3";
 
@@ -40,7 +59,7 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
     const payload = {
         name: document.getElementById('name').value,
         address: document.getElementById('address').value,
-        contact_number: document.getElementById('contact').value,
+        contact_number: document.getElementById('contact-number').value,
         followup_date: document.getElementById('followup').value,
         medications: document.getElementById('medications').value,
         notes: document.getElementById('notes').value
@@ -54,7 +73,7 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
         });
 
         if (response.ok) {
-            statusDiv.textContent = "✅ Patient successfully registered in system!";
+            statusDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i> Patient successfully registered in system!';
             statusDiv.style.backgroundColor = "#d4edda";
             statusDiv.style.color = "#155724";
             document.getElementById('patientForm').reset();
@@ -63,14 +82,14 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
         }
     } catch (error) {
         console.error("Submission Error:", error);
-        statusDiv.textContent = "❌ Failed to save. Please verify your Vercel DB connection.";
+        statusDiv.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Failed to save. Please verify your Vercel DB connection.';
         statusDiv.style.backgroundColor = "#f8d7da";
         statusDiv.style.color = "#721c24";
     }
 
     // Auto-clear message after 5 seconds
     setTimeout(() => {
-        statusDiv.textContent = "";
+        statusDiv.innerHTML = "";
         statusDiv.style.backgroundColor = "transparent";
     }, 5000);
 });
@@ -78,7 +97,7 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
 // Fetch and display patients
 async function loadPatients() {
     const tbody = document.getElementById('patientsTableBody');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Loading records...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Loading records...</td></tr>';
 
     try {
         const response = await fetch('/api/patients');
@@ -86,7 +105,7 @@ async function loadPatients() {
 
         tbody.innerHTML = '';
         if (patients.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No patient records found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2.5rem;"><i class="fa-regular fa-folder-open fa-3x" style="color: #cbd5e1; margin-bottom: 1rem;"></i><br>No patient records found.</td></tr>';
             return;
         }
 
@@ -94,12 +113,12 @@ async function loadPatients() {
             const followupDate = patient.followup_date ? new Date(patient.followup_date).toLocaleDateString('en-IN') : 'N/A';
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong class="patient-name-link" onclick='openViewModal(${JSON.stringify(patient).replace(/'/g, "&apos;")})'>${patient.name}</strong></td>
-                <td>${patient.contact_number}</td>
-                <td>${followupDate}</td>
-                <td>${patient.medications || '-'}</td>
-                <td>
-                    <button class="btn-edit" onclick='openEditModal(${JSON.stringify(patient).replace(/'/g, "&apos;")})'>Edit</button>
+                <td data-label="Name"><strong class="patient-name-link" onclick='openViewModal(${JSON.stringify(patient).replace(/'/g, "&apos;")})'>${patient.name}</strong></td>
+                <td data-label="Contact">${patient.contact_number}</td>
+                <td data-label="Follow-up">${followupDate}</td>
+                <td data-label="Medications">${patient.medications || '-'}</td>
+                <td data-label="Actions">
+                    <button class="btn-edit" onclick='openEditModal(${JSON.stringify(patient).replace(/'/g, "&apos;")})'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -114,7 +133,7 @@ async function loadPatients() {
 async function loadTodayFollowups() {
     const tbody = document.getElementById('todayTableBody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Loading records...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Loading records...</td></tr>';
 
     try {
         const response = await fetch('/api/patients/today');
@@ -122,17 +141,17 @@ async function loadTodayFollowups() {
 
         tbody.innerHTML = '';
         if (patients.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No follow-ups scheduled for today.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 2rem;"><i class="fa-regular fa-calendar-check fa-2x" style="color: #cbd5e1; margin-bottom: 0.5rem;"></i><br>No follow-ups scheduled for today.</td></tr>';
             return;
         }
 
         patients.forEach(patient => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${patient.name}</strong></td>
-                <td>${patient.contact_number}</td>
-                <td>
-                    <button class="btn-view" onclick='openViewModal(${JSON.stringify(patient).replace(/'/g, "&apos;")})'>View History</button>
+                <td data-label="Name"><strong>${patient.name}</strong></td>
+                <td data-label="Contact Number">${patient.contact_number}</td>
+                <td data-label="Actions">
+                    <button class="btn-view" onclick='openViewModal(${JSON.stringify(patient).replace(/'/g, "&apos;")})'><i class="fa-solid fa-clock-rotate-left"></i> History</button>
                 </td>
             `;
             tbody.appendChild(tr);
