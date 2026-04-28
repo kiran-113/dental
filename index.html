@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCare India | Dental Hospital</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">🦷 SmileCare India</div>
+        <nav>
+            <button class="tab-btn active" onclick="openTab('about')">About</button>
+            <button class="tab-btn" onclick="openTab('patient-care')">Patient Care</button>
+            <button class="tab-btn" onclick="openTab('contact')">Contact Us</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- About Tab -->
+        <section id="about" class="tab-content active">
+            <h2>Welcome to SmileCare India</h2>
+            <p>Providing world-class, affordable dental care for Indian families. We specialize in root canals, advanced implants, and preventative hygiene using state-of-the-art technology.</p>
+            <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&q=80&w=1000" alt="Modern Dental Clinic" class="hero-img">
+        </section>
+
+        <!-- Patient Care Tab -->
+        <section id="patient-care" class="tab-content">
+            <h2>Patient Care & Registration</h2>
+            <p>Enter patient details below to add a new record to our Vercel Database.</p>
+
+            <form id="patientForm" class="patient-form">
+                <div class="form-group">
+                    <label for="name">Patient Name:</label>
+                    <input type="text" id="name" required placeholder="e.g., Rahul Sharma">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <textarea id="address" required placeholder="Full residential address..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="contact">Contact Number:</label>
+                    <input type="tel" id="contact" required placeholder="+91 98765 43210">
+                </div>
+
+                <div class="form-group">
+                    <label for="followup">Follow-up Date:</label>
+                    <input type="date" id="followup" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="medications">Current Medication (if any):</label>
+                    <input type="text" id="medications" placeholder="e.g., Paracetamol, Amoxicillin">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Doctor's Notes:</label>
+                    <textarea id="notes" placeholder="Diagnosis, symptoms, and treatment plan..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Register Patient</button>
+            </form>
+            <div id="statusMessage"></div>
+        </section>
+
+        <!-- Contact Us Tab -->
+        <section id="contact" class="tab-content">
+            <h2>Contact Us</h2>
+            <div class="contact-card">
+                <p><strong>🏥 Address:</strong> 42 Health Avenue, Bandra West, Mumbai, Maharashtra 400050</p>
+                <p><strong>📞 Phone:</strong> +91 22 1234 5678</p>
+                <p><strong>✉️ Email:</strong> appointments@smilecare.in</p>
+                <p><strong>⏰ Timings:</strong> Mon - Sat: 9:00 AM - 8:00 PM</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

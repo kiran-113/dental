@@ -1,0 +1,8 @@
+# Dependencies
+/node_modules
+
+# Environment variables - DO NOT COMMIT THIS FILE!
+.env
+
+# Logs
+npm-debug.log*
