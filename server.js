@@ -4,19 +4,23 @@ const { Pool } = require('pg');
 const path = require('path');
 const cors = require('cors');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT
 const sessions = new Map();
-const doctorUsername = process.env.DOCTOR_USERNAME || 'doctor';
-const doctorPassword = process.env.DOCTOR_PASSWORD || 'smilecare123';
+const doctorUsername = process.env.DOCTOR_USERNAME;
+const doctorPassword = process.env.DOCTOR_PASSWORD;
 const schedulerState = {
   lastRunDate: null,
   running: false
 };
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? 'https://dental-six-mocha.vercel.app' : 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // Serve static files explicitly since they are in the root directory
@@ -43,7 +47,14 @@ function requireAuth(req, res, next) {
   return res.status(401).json({ error: 'Authentication required.' });
 }
 
-app.post('/api/auth/login', (req, res) => {
+// Rate limiter: Max 5 login attempts per 15 minutes
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' }
+});
+
+app.post('/api/auth/login', loginLimiter, (req, res) => {
   const { username, password } = req.body;
   if (username !== doctorUsername || password !== doctorPassword) {
     return res.status(401).json({ error: 'Invalid username or password.' });
