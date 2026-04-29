@@ -51,12 +51,15 @@ function setupLoginForm() {
 async function checkAuth() {
     try {
         const response = await fetch('/api/auth/me');
-        if (!response.ok) throw new Error('Not signed in');
+        if (!response.ok) throw new Error('Network error');
+
+        const data = await response.json();
+        if (!data.authenticated) throw new Error('Not signed in');
 
         document.getElementById('loginOverlay').classList.add('hidden');
         await loadTreatmentCategories();
         await loadDashboard();
-    } catch {
+    } catch (error) {
         document.getElementById('loginOverlay').classList.remove('hidden');
     }
 }

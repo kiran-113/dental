@@ -68,7 +68,7 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 app.get('/api/auth/me', (req, res) => {
-  if (!isAuthenticated(req)) return res.status(401).json({ authenticated: false });
+  if (!isAuthenticated(req)) return res.json({ authenticated: false });
   const token = parseCookies(req).smilecare_session;
   res.json({ authenticated: true, username: sessions.get(token).username });
 });
@@ -172,7 +172,7 @@ const initDb = async () => {
       await pool.query('INSERT INTO treatment_categories (name) VALUES ($1) ON CONFLICT (name) DO NOTHING', [category]);
     }
 
-    console.log("Database initialized successfully.");
+    console.log("Database initialized successfully."); // Keep console log for local dev visibility
   } catch (err) {
     console.error("Error initializing database:", err);
   }
