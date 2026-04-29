@@ -8,7 +8,6 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 const port = process.env.PORT
-const sessions = new Map();
 const doctorUsername = process.env.DOCTOR_USERNAME;
 const doctorPassword = process.env.DOCTOR_PASSWORD;
 const schedulerState = {
@@ -37,13 +36,20 @@ function parseCookies(req) {
   }, {});
 }
 
-function isAuthenticated(req) {
+async function isAuthenticated(req) {
   const token = parseCookies(req).smilecare_session;
-  return Boolean(token && sessions.has(token));
+  if (!token) return false;
+  try {
+    const result = await pool.query("SELECT username FROM sessions WHERE token = $1 AND created_at >= NOW() - INTERVAL '8 hours'", [token]);
+    return result.rows.length > 0;
+  } catch (err) {
+    console.error('Session check error:', err);
+    return false;
+  }
 }
 
-function requireAuth(req, res, next) {
-  if (isAuthenticated(req)) return next();
+async function requireAuth(req, res, next) {
+  if (await isAuthenticated(req)) return next();
   return res.status(401).json({ error: 'Authentication required.' });
 }
 
@@ -54,14 +60,22 @@ const loginLimiter = rateLimit({
   message: { error: 'Too many login attempts. Please try again in 15 minutes.' }
 });
 
-app.post('/api/auth/login', loginLimiter, (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { username, password } = req.body;
   if (username !== doctorUsername || password !== doctorPassword) {
     return res.status(401).json({ error: 'Invalid username or password.' });
   }
 
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, { username, createdAt: Date.now() });
+  try {
+    // Self-cleaning: Delete old expired sessions from the database to prevent bloat
+    await pool.query("DELETE FROM sessions WHERE created_at < NOW() - INTERVAL '8 hours'");
+
+    await pool.query('INSERT INTO sessions (token, username) VALUES ($1, $2)', [token, username]);
+  } catch (err) {
+    console.error('Login session error:', err);
+    return res.status(500).json({ error: 'Failed to create session.' });
+  }
   res.cookie('smilecare_session', token, {
     httpOnly: true,
     sameSite: 'strict',
@@ -71,17 +85,29 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
   res.json({ authenticated: true, username });
 });
 
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', async (req, res) => {
   const token = parseCookies(req).smilecare_session;
-  if (token) sessions.delete(token);
+  if (token) {
+    try {
+      await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
+    } catch (err) {
+      console.error('Logout session error:', err);
+    }
+  }
   res.clearCookie('smilecare_session');
   res.json({ authenticated: false });
 });
 
-app.get('/api/auth/me', (req, res) => {
-  if (!isAuthenticated(req)) return res.json({ authenticated: false });
+app.get('/api/auth/me', async (req, res) => {
   const token = parseCookies(req).smilecare_session;
-  res.json({ authenticated: true, username: sessions.get(token).username });
+  if (!token) return res.json({ authenticated: false });
+  try {
+    const result = await pool.query("SELECT username FROM sessions WHERE token = $1 AND created_at >= NOW() - INTERVAL '8 hours'", [token]);
+    if (result.rows.length === 0) return res.json({ authenticated: false });
+    res.json({ authenticated: true, username: result.rows[0].username });
+  } catch (err) {
+    res.json({ authenticated: false });
+  }
 });
 
 app.use('/api', requireAuth);
@@ -97,6 +123,14 @@ const pool = new Pool({
 
 // Initialize Database Table
 const initDb = async () => {
+  const sessionsQuery = `
+    CREATE TABLE IF NOT EXISTS sessions (
+      token VARCHAR(255) PRIMARY KEY,
+      username VARCHAR(100) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
   const patientsQuery = `
     CREATE TABLE IF NOT EXISTS patients (
       id SERIAL PRIMARY KEY,
@@ -155,6 +189,7 @@ const initDb = async () => {
   `;
 
   try {
+    await pool.query(sessionsQuery);
     await pool.query(patientsQuery);
     await pool.query(patientVisitsQuery);
     await pool.query(categoriesQuery);
